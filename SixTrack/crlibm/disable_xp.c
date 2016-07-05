@@ -7,13 +7,15 @@ void disable_xp_(void)
 {
 }
 
-#elif defined(_WIN32)
+#elif defined(_WIN32) //_WIN32 means we're not running 16-bit Windows, i.e. it can be either 32- or 64-bit.
 
 #include <float.h>
 
 void disable_xp_(void)
 {
+#ifndef _WIN64
   _controlfp(_PC_53, _MCW_PC);
+#endif
 }
 
 #else
