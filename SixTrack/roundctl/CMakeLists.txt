@@ -2,7 +2,7 @@ SET(LIBERIC_SOURCES round_near.c dtoa_c.c dtoaf.c fpuctl.c) #Library for convert
 add_library(roundctl STATIC ${LIBERIC_SOURCES})
 
 if(32BIT)
-  target_compile_options(roundctl PRIVATE -m32)
+  target_compile_options(roundctl PRIVATE -m32 -mfxsr)
 endif(32BIT)
 if(64BIT)
   target_compile_options(roundctl PRIVATE -m64)

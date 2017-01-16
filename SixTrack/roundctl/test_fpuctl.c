@@ -1,6 +1,6 @@
 // To compile:
 // gcc -std=c99 -Wall -W -pedantic test_fpuctl.c -o test_fpuctl
-
+// gcc -std=c99 -Wall -W -pedantic test_fpuctl.c -o test_fpuctl -m32 -mfxsr
 //#include "fpuctl.h"
 
 #include <inttypes.h>
