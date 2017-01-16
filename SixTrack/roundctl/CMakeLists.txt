@@ -1,4 +1,4 @@
-SET(LIBERIC_SOURCES round_near.c dtoa_c.c dtoaf.c enable_xp.c disable_xp.c) #Library for converting between Double <-> ASCII
+SET(LIBERIC_SOURCES round_near.c dtoa_c.c dtoaf.c fpuctl.c) #Library for converting between Double <-> ASCII and for setting FPU flags
 add_library(roundctl STATIC ${LIBERIC_SOURCES})
 
 if(32BIT)
