@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 // For comparison; Defines _FPU_GETCW and _FPU_SETCW + various bitmasks.
-#ifndef _WIN32
+#if defined(__linux__) || defined(__apple__)
 
 #include <fpu_control.h> 
 
