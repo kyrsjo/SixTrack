@@ -97,7 +97,7 @@ uint16_t getCW_x87(){
   return cw;
 }
 
-#ifndef _WIN32
+#if defined(__linux__) || defined(__apple__)
 fpu_control_t getCW_x87_2(){
   // Read the x87 state, using float.h
   fpu_control_t cw = 0;
@@ -110,7 +110,7 @@ void print_x87() {
   uint16_t cw=getCW_x87();
   printf("cw:  %0" PRIu16 " [ 0x%" PRIx16 " ]\n", cw,cw);
 
-#ifndef _WIN32
+#if defined(__linux__) || defined(__apple__)
   fpu_control_t cw2 = getCW_x87_2();
   printf("cw2: %" PRIu16 " [ 0x%" PRIx16 " ]\n", cw2, cw2);
 #endif
