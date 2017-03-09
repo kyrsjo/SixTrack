@@ -30,19 +30,34 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "GNU")
   # In old crlibm, suppress some warnings. It's too many of them to be usefull...
   set(lessWarnings  -Wno-sign-conversion -Wno-conversion -Wno-long-long)
   
-  target_compile_options(crlibm1 PRIVATE -mfpmath=sse -msse2 -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline -pedantic -fno-strict-aliasing ${lessWarnings})
-  target_compile_options(crlibm2 PRIVATE -mfpmath=sse -msse2 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline ${lessWarnings})
+  if(NOSSE2)
+    SET(SSEFLAGS -mfpmath=387 -mno-sse2)
+  else() # Default
+    SET(SSEFLAGS -mfpmath=sse -msse2)
+  endif()
+  target_compile_options(crlibm1 PRIVATE ${SSEFLAGS} -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline -pedantic -fno-strict-aliasing ${lessWarnings})
+  target_compile_options(crlibm2 PRIVATE ${SSEFLAGS} -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline ${lessWarnings})
   
   if(COVERAGE)
     target_compile_options(crlibm1 PRIVATE -fprofile-arcs -ftest-coverage)
     target_compile_options(crlibm2 PRIVATE -fprofile-arcs -ftest-coverage)
   endif(COVERAGE)
 elseif(${CMAKE_C_COMPILER_ID} MATCHES "Intel")
-  target_compile_options(crlibm1 PRIVATE -msse2 -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wconversion -Wstrict-prototypes -Winline -pedantic -fno-strict-aliasing)
-  target_compile_options(crlibm2 PRIVATE -msse2 -Wall -Wshadow -Wpointer-arith -Wconversion -Wstrict-prototypes -Winline)
+  if(NOSSE2)
+    SET(SSEFLAGS "-mno-sse2")
+  else() # Default
+    SET(SSEFLAGS "-msse2")
+  endif()
+  target_compile_options(crlibm1 PRIVATE ${SSEFLAGS} -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wconversion -Wstrict-prototypes -Winline -pedantic -fno-strict-aliasing)
+  target_compile_options(crlibm2 PRIVATE ${SSEFLAGS} -Wall -Wshadow -Wpointer-arith -Wconversion -Wstrict-prototypes -Winline)
 else()
-  target_compile_options(crlibm1 PRIVATE -mfpmath=sse -msse2 -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline -pedantic -fno-strict-aliasing)
-  target_compile_options(crlibm2 PRIVATE -mfpmath=sse -msse2 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline)
+  if(NOSSE2)
+    SET(SSEFLAGS "-mfpmath=387 -mno-sse2")
+  else() # Default
+    SET(SSEFLAGS "-mfpmath=sse -msse2")
+  endif()
+  target_compile_options(crlibm1 PRIVATE ${SSEFLAGS} -fPIC -std=c99 -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline -pedantic -fno-strict-aliasing)
+  target_compile_options(crlibm2 PRIVATE ${SSEFLAGS} -Wall -Wshadow -Wpointer-arith -Wcast-align -Wconversion -Waggregate-return -Wstrict-prototypes -Wnested-externs -Wlong-long -Winline)
 endif()
 
 #glue the parts together

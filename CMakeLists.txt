@@ -98,6 +98,7 @@ OPTION(STATIC "Create a statically linked binary" ON)
 OPTION(NATIVE "Enable optimizations for the current machine" OFF)
 OPTION(AVX "Enable use of the Advanced Vector Extensions (AVX) instruction set - Sandy Bridge and later" OFF)
 OPTION(AVX2 "Enable use of the Advanced Vector Extensions 2 (AVX2) instruction set - Haswell and later" OFF)
+OPTION(NOSSE2 "Force the use of the x87 FPU, for compatibility with ancient hardware" OFF)
 
 OPTION(BUILD_TESTING "Enable the SixTest suite" OFF)
 
@@ -221,6 +222,9 @@ if(AVX2)
 endif(AVX2)
 if(NATIVE)
 	SET(SIXTRACK_FEATURES "${SIXTRACK_FEATURES}_native")
+endif() 
+if(NOSSE2)
+	SET(SIXTRACK_FEATURES "${SIXTRACK_FEATURES}_nosse2")
 endif()
 
 SET(SIXTRACK_FEATURES "${SIXTRACK_FEATURES}_${CMAKE_SYSTEM_PROCESSOR}")
@@ -533,9 +537,16 @@ get_filename_component (Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME)
 
 #lots of games to play here.... start with fortran flags
 if (Fortran_COMPILER_NAME MATCHES "gfortran.*")
-	# gfortran
-	SET(CMAKE_Fortran_FLAGS "-frecord-marker=4 -fno-second-underscore -funroll-loops -mfpmath=sse -msse2")
-	SET(CMAKE_Fortran_FLAGS_RELEASE "-O3")
+        # gfortran
+
+	SET(CMAKE_Fortran_FLAGS "-frecord-marker=4 -fno-second-underscore -funroll-loops")
+	if(NOT NOSSE2) # Default configuration)
+		SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mfpmath=sse -msse2")
+		SET(CMAKE_Fortran_FLAGS_RELEASE "-O3")
+	else()
+		SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mfpmath=387 -mno-sse2")
+		SET(CMAKE_Fortran_FLAGS_RELEASE "-O3")
+	endif()
 	SET(CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g3 -ffpe-trap=invalid,zero,overflow,underflow -fcheck=all")
 
 	if(32BIT)
@@ -554,9 +565,9 @@ if (Fortran_COMPILER_NAME MATCHES "gfortran.*")
 	endif(AVX2)
 
 	if(NATIVE)
-	  SET(CMAKE_Fortran_FLAGS "-march=native -mno-fma4 -mno-fma ${CMAKE_Fortran_FLAGS}")
+		SET(CMAKE_Fortran_FLAGS "-march=native -mno-fma4 -mno-fma ${CMAKE_Fortran_FLAGS}")
 	endif(NATIVE)
-
+	
 	if(STATIC)
 		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 			SET(CMAKE_Fortran_LINKER_FLAGS "-Bstatic -static-libgcc -static-libgfortran ${CMAKE_Fortran_LINKER_FLAGS}")
